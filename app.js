@@ -19,13 +19,30 @@ const path = require('path');
 
 // Set view as ejs
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'))
+app.set('views', path.join(__dirname, 'views'));
 
+// Use middleware that parses urlencoded
+app.use(express.urlencoded({ extended: true }));
+
+// INDEX ROUTE
 app.get('/campgrounds', async (req, res) => {
     const campgrounds = await Campground.find({});
     res.render('campgrounds/index', { campgrounds });
 })
 
+// NEW ROUTE
+app.get('/campgrounds/new', (req, res) => {
+    res.render('campgrounds/new');
+})
+
+// CREATE ROUTE
+app.post('/campgrounds', async (req, res) => {
+    const campground = new Campground(req.body.campground);
+    await campground.save();
+    res.redirect(`/campgrounds/${campground._id}`);
+})
+
+// SHOW ROUTE
 app.get('/campgrounds/:id', async (req, res) => {
     const campground = await Campground.findById(req.params.id);
     res.render('campgrounds/show', { campground });
