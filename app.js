@@ -9,6 +9,8 @@ const methodOverride = require('method-override');
 const Campground = require('./models/campground');
 const Review = require('./models/review');
 
+const campgrounds = require('./routes/campgrounds');
+
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
     useNewUrlParser: true,
     useCreateIndex: true,
@@ -35,33 +37,6 @@ app.use(express.urlencoded({ extended: true }));
 // Override method with query string
 app.use(methodOverride('_method'));
 
-// HOME
-app.get('/', (req, res) => {
-    res.render('home');
-})
-
-// INDEX ROUTE
-app.get('/campgrounds', catchAsync(async (req, res) => {
-    const campgrounds = await Campground.find({});
-    res.render('campgrounds/index', { campgrounds });
-}))
-
-// NEW ROUTE
-app.get('/campgrounds/new', (req, res) => {
-    res.render('campgrounds/new');
-})
-
-// Validation middlewares
-const validateCampground = (req, res, next) => {
-    const { error } = campgroundSchema.validate(req.body);
-    if (error) {
-        const msg = error.details.map(el => el.message).join(',')
-        throw new ExpressError(msg, 400);
-    } else {
-        next();
-    }
-}
-
 const validateReview = (req, res, next) => {
     const { error } = reviewSchema.validate(req.body);
     if (error) {
@@ -72,38 +47,12 @@ const validateReview = (req, res, next) => {
     }
 }
 
-// CREATE ROUTE
-app.post('/campgrounds', validateCampground, catchAsync(async (req, res, next) => {
-    const campground = new Campground(req.body.campground);
-    await campground.save();
-    res.redirect(`/campgrounds/${campground._id}`);
-}))
+app.use('/campgrounds', campgrounds);
 
-// SHOW ROUTE
-app.get('/campgrounds/:id', catchAsync(async (req, res) => {
-    const campground = await Campground.findById(req.params.id).populate('reviews');
-    res.render('campgrounds/show', { campground });
-}))
-
-// EDIT ROUTE
-app.get('/campgrounds/:id/edit', catchAsync(async (req, res) => {
-    const campground = await Campground.findById(req.params.id);
-    res.render('campgrounds/edit', { campground });
-}))
-
-// UPDATE ROUTE
-app.put('/campgrounds/:id', validateCampground, catchAsync(async (req, res) => {
-    const { id } = req.params;
-    const campground = await Campground.findByIdAndUpdate(id, {...req.body.campground}, {useFindAndModify: false});
-    res.redirect(`/campgrounds/${campground._id}`);
-}))
-
-// DELETE ROUTE
-app.delete('/campgrounds/:id', catchAsync(async (req, res) => {
-    const { id } = req.params;
-    await Campground.findByIdAndDelete(id);
-    res.redirect('/campgrounds');
-}))
+// HOME
+app.get('/', (req, res) => {
+    res.render('home');
+})
 
 // REVIEW ROUTE
 app.post('/campgrounds/:id/reviews', validateReview, catchAsync(async (req, res) => {
