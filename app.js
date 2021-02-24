@@ -65,8 +65,9 @@ app.use(methodOverride('_method'));
 // Serve static assets
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Middleware for flash message (all requests have access)
+// All templates have access
 app.use((req, res, next) => {
+    res.locals.currentUser = req.user;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
     next();
