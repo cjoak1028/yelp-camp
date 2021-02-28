@@ -93,6 +93,8 @@ const scriptSrcUrls = [
     "https://kit.fontawesome.com",
     "https://cdnjs.cloudflare.com",
     "https://cdn.jsdelivr.net",
+    "https://code.jquery.com",
+    "https://maxcdn.bootstrapcdn.com",
 ];
 const styleSrcUrls = [
     "https://kit-free.fontawesome.com",
@@ -102,6 +104,7 @@ const styleSrcUrls = [
     "https://fonts.googleapis.com",
     "https://use.fontawesome.com",
     "https://cdn.jsdelivr.net",
+    "https://maxcdn.bootstrapcdn.com",
 ];
 const connectSrcUrls = [
     "https://api.mapbox.com",
@@ -153,7 +156,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // All templates have access
 app.use((req, res, next) => {
     // console.log(req.session)
-    console.log(req.query);
+    // console.log(req.query);
     res.locals.currentUser = req.user;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
